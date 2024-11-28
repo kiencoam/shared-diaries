@@ -11,12 +11,15 @@ export const GET = async (
   const session = await getServerSession(authOptions);
   const user = session?.user;
 
-  const tag = (await params).name;
+  const tagName = (await params).name;
 
   try {
     await connectToDB();
 
-    const documentPosts = await Post.find({ tags: tag });
+    const documentPosts = await Post.find().populate([
+      { path: "creator" },
+      { path: "tags", match: { name: tagName } },
+    ]);
 
     const viewPosts = documentPosts.map((post) => ({
       ...post.toObject(),
@@ -25,6 +28,7 @@ export const GET = async (
 
     return new Response(JSON.stringify(viewPosts), { status: 200 });
   } catch (error) {
+    console.error(error);
     return new Response(JSON.stringify(error), { status: 500 });
   }
 };

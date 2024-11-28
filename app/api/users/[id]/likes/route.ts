@@ -16,9 +16,10 @@ export const GET = async (
   try {
     await connectToDB();
 
-    const documentPosts = await Post.find({ likes: userId }).populate(
-      "creator"
-    );
+    const documentPosts = await Post.find({ likes: userId }).populate([
+      "creator",
+      "tags",
+    ]);
 
     const viewPosts = documentPosts.map((post) => ({
       ...post.toObject(),
@@ -27,6 +28,7 @@ export const GET = async (
 
     return new Response(JSON.stringify(viewPosts), { status: 200 });
   } catch (error) {
+    console.error(error);
     return new Response(JSON.stringify(error), { status: 500 });
   }
 };

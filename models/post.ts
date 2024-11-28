@@ -1,3 +1,4 @@
+import { create } from "domain";
 import { Schema, model, models } from "mongoose";
 
 const PostSchema = new Schema({
@@ -21,10 +22,14 @@ const PostSchema = new Schema({
       ref: "User",
     },
   ],
-  likeConut: {
+  likeCount: {
     type: Number,
     default: 0,
     required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

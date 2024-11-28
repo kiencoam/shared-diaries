@@ -1,8 +1,11 @@
 import { connectToDB } from "@utils/database";
 import Post from "@models/post";
+import Tag from "@models/tag";
 import { createNewTagIfNotExists } from "@utils/server-actions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@app/api/auth/[...nextauth]/route";
+
+import { DocumentPost, ViewPost } from "@data";
 
 interface RequestBody {
   content: string;
@@ -14,20 +17,20 @@ export const GET = async (
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) => {
-  const session = await getServerSession(authOptions);
-  const user = session?.user;
-
   const postId = (await params).id;
 
   try {
     await connectToDB();
 
-    const post = await Post.findById(postId).populate("creator");
-    if (!post) return new Response("Post not found", { status: 404 });
+    const documentPost = await Post.findById(postId).populate([
+      "creator",
+      "tags",
+    ]);
+    if (!documentPost) return new Response("Post not found", { status: 404 });
 
-    post.haveLiked = post.likes.includes(user?.id);
-    return new Response(JSON.stringify(post), { status: 200 });
+    return new Response(JSON.stringify(documentPost), { status: 200 });
   } catch (error) {
+    console.error(error);
     return new Response(JSON.stringify(error), { status: 500 });
   }
 };
@@ -39,6 +42,7 @@ export const PATCH = async (
 ) => {
   const session = await getServerSession(authOptions);
   const user = session?.user;
+  if (!user) return new Response("Unauthorized", { status: 401 });
 
   const postId = (await params).id;
   const { content, tags }: RequestBody = await req.json();
@@ -58,12 +62,21 @@ export const PATCH = async (
     for (const tag of tags) {
       await createNewTagIfNotExists(tag);
     }
-    post.tags = tags;
+
+    const tagIds = await Promise.all(
+      tags.map(async (tag) => {
+        const documentTag = await Tag.findOne({ name: tag });
+        return documentTag ? documentTag._id : null;
+      })
+    );
+
+    post.tags = tagIds;
 
     await post.save();
 
     return new Response(JSON.stringify(post), { status: 200 });
   } catch (error) {
+    console.error(error);
     return new Response(JSON.stringify(error), { status: 500 });
   }
 };
@@ -75,6 +88,7 @@ export const DELETE = async (
 ) => {
   const session = await getServerSession(authOptions);
   const user = session?.user;
+  if (!user) return new Response("Unauthorized", { status: 401 });
 
   const postId = (await params).id;
 
@@ -90,6 +104,7 @@ export const DELETE = async (
 
     return new Response(JSON.stringify(post), { status: 200 });
   } catch (error) {
+    console.error(error);
     return new Response(JSON.stringify(error), { status: 500 });
   }
 };

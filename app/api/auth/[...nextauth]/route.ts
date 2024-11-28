@@ -15,11 +15,13 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async session({ session }) {
-      const sessionUser = await User.findOne({ email: session?.user?.email });
-      if (session.user) {
-        session.user.id = sessionUser?._id.toString();
+      if (session) {
+        await connectToDB();
+        const sessionUser = await User.findOne({ email: session.user?.email });
+        if (session.user) {
+          session.user.id = sessionUser?._id.toString();
+        }
       }
-
       return session;
     },
     async signIn({ profile }) {

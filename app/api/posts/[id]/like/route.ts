@@ -2,6 +2,7 @@ import { connectToDB } from "@utils/database";
 import Post from "@models/post";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@app/api/auth/[...nextauth]/route";
+import { ObjectId } from "mongoose";
 
 interface RequestBody {
   userId: string;
@@ -19,7 +20,8 @@ export const PATCH = async (
   const postId = (await params).id;
   const { userId, like }: RequestBody = await req.json();
 
-  if (userId !== user?.id) return new Response("Unauthorized", { status: 401 });
+  if (!user || userId !== user.id)
+    return new Response("Unauthorized", { status: 401 });
 
   try {
     await connectToDB();
@@ -31,13 +33,16 @@ export const PATCH = async (
       post.likes.push(userId);
       post.likeCount++;
     } else {
-      post.likes = post.likes.filter((id: string) => id !== userId);
+      post.likes = post.likes.filter(
+        (id: ObjectId) => id.toString() !== userId
+      );
       post.likeCount--;
     }
 
     await post.save();
     return new Response(JSON.stringify(post), { status: 200 });
   } catch (error) {
+    console.error(error);
     return new Response(JSON.stringify(error), { status: 500 });
   }
 };

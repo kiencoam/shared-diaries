@@ -21,6 +21,7 @@ export const GET = async (
 
     return new Response(JSON.stringify(viewUser), { status: 200 });
   } catch (error) {
+    console.error(error);
     return new Response(JSON.stringify(error), { status: 500 });
   }
 };
@@ -50,6 +51,7 @@ export const PATCH = async (
     await user.save();
     return new Response(JSON.stringify(user), { status: 200 });
   } catch (error) {
+    console.error(error);
     return new Response(JSON.stringify(error), { status: 500 });
   }
 };

@@ -4,6 +4,7 @@ import Feed from "@components/Feed";
 import { Suspense } from "react";
 import { fetchTotalPages } from "@utils/server-actions";
 import Sort from "@components/Sort";
+import FeedSkeleton from "@components/FeedSkeleton";
 
 const HomePage = async (props: {
   searchParams?: Promise<{ query?: string; page?: string; sortby?: string }>;
@@ -34,7 +35,7 @@ const HomePage = async (props: {
         <Sort sortby={sortby} />
         <Suspense
           key={query + currentPage + sortby}
-          fallback={<div>Loading...</div>}
+          fallback={<FeedSkeleton cards={9} />}
         >
           <Feed query={query} currentPage={currentPage} sortby={sortby} />
         </Suspense>

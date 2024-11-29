@@ -22,28 +22,22 @@ const Card = ({ post }: { post: ViewPost }) => {
     setTimeAgo(calculateTimeAgo(post.createdAt));
   }, [post]);
 
-  const handleLike = async () => {
-    try {
-      if (!session?.user?.id) {
-        alert("Hãy đăng nhập để thích bài viết này!");
-        return;
-      }
-
-      const response = await fetch(`/api/posts/${post._id}/like`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          userId: session?.user?.id,
-          like: !liked,
-        }),
-      });
-
-      if (response.ok) {
-        setLikeCount(liked ? likeCount - 1 : likeCount + 1);
-        setLiked(!liked);
-      }
-    } catch (error) {
-      console.error(error);
+  const handleLike = () => {
+    if (!session?.user?.id) {
+      alert("Hãy đăng nhập để thích bài viết này!");
+      return;
     }
+
+    setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+    setLiked(!liked);
+
+    fetch(`/api/posts/${post._id}/like`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        userId: session?.user?.id,
+        like: !liked,
+      }),
+    });
   };
 
   const handleDelete = async () => {
@@ -112,13 +106,13 @@ const Card = ({ post }: { post: ViewPost }) => {
           </div>
           <div className="flex-start gap-3 flex-wrap">
             {post.tags.map((tag) => (
-              <div
+              <Link
                 key={tag._id}
-                onClick={() => {}}
-                className="font-inter text-sm blue_gradient cursor-pointer"
+                href={`/tag/${tag._id}`}
+                className="font-inter text-sm blue_gradient"
               >
                 #{tag.name}
-              </div>
+              </Link>
             ))}
           </div>
 

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { ViewUser } from "@data";
+import AccountSkeleton from "@components/AccountSkeleton";
 
 const AccountPage = () => {
   const { data: session, status } = useSession();
@@ -50,7 +51,7 @@ const AccountPage = () => {
     }
   }, [status, session, router]);
 
-  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading") return <AccountSkeleton />;
 
   const handleSave = async () => {
     try {

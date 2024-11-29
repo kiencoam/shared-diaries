@@ -6,7 +6,7 @@ import User from "@models/user";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@app/api/auth/[...nextauth]/route";
 import { connectToDB } from "@utils/database";
-import { DocumentPost, ViewPost, ViewUser } from "@data";
+import { DocumentPost, ViewPost, ViewTag, ViewUser } from "@data";
 
 export const createNewTagIfNotExists = async (tagName: string) => {
   const tagExists = await Tag.findOne({ name: tagName });
@@ -27,6 +27,22 @@ export const fetchUserById = async (
 
     const user: ViewUser = JSON.parse(JSON.stringify(documentUser));
     return user;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+export const fetchTagById = async (tagId: string): Promise<ViewTag | null> => {
+  try {
+    await connectToDB();
+
+    const documentTag = await Tag.findById(tagId);
+    if (!documentTag) return null;
+
+    const tag: ViewTag = JSON.parse(JSON.stringify(documentTag));
+
+    return tag;
   } catch (error) {
     console.error(error);
     return null;
@@ -155,13 +171,18 @@ export const fetchLikedPosts = async (
   try {
     await connectToDB();
 
+    let sortOption: { [key: string]: 1 | -1 } = { createdAt: -1 };
+    if (sortBy === "likest") {
+      sortOption = { likeCount: -1 };
+    }
+
     const documentPosts = await Post.find({
       likes: userId,
     })
       .skip(perPage * (currentPage - 1))
       .limit(perPage)
       .populate(["creator", "tags"])
-      .sort({ createdAt: -1 });
+      .sort(sortOption);
 
     const posts: DocumentPost[] = JSON.parse(JSON.stringify(documentPosts));
 
@@ -184,6 +205,62 @@ export const fetchTotalPagesLiked = async (userId: string, perPage: number) => {
 
     const totalPosts = await Post.countDocuments({
       likes: userId,
+    });
+
+    return Math.ceil(totalPosts / perPage);
+  } catch (error) {
+    console.error(error);
+    return 0;
+  }
+};
+
+// Fetch all posts by tag
+export const fetchPostsByTag = async (
+  tagId: string,
+  currentPage: number,
+  perPage: number,
+  sortBy: string
+) => {
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
+
+  try {
+    await connectToDB();
+
+    let sortOption: { [key: string]: 1 | -1 } = { createdAt: -1 };
+    if (sortBy === "likest") {
+      sortOption = { likeCount: -1 };
+    }
+
+    const documentPosts = await Post.find({
+      tags: tagId,
+    })
+      .skip(perPage * (currentPage - 1))
+      .limit(perPage)
+      .populate(["creator", "tags"])
+      .sort(sortOption);
+
+    const posts: DocumentPost[] = JSON.parse(JSON.stringify(documentPosts));
+
+    const viewPosts: ViewPost[] = posts.map((post: DocumentPost) => ({
+      ...post,
+      createdAt: new Date(post.createdAt),
+      haveLiked: post.likes.includes(user?.id || ""),
+    }));
+
+    return viewPosts;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
+export const fetchTotalPagesByTag = async (tagId: string, perPage: number) => {
+  try {
+    await connectToDB();
+
+    const totalPosts = await Post.countDocuments({
+      tags: tagId,
     });
 
     return Math.ceil(totalPosts / perPage);

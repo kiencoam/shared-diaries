@@ -7,6 +7,7 @@ import Form from "@components/Form";
 
 import { CreatePost, DocumentPost } from "@data";
 import { MouseEventHandler, Suspense } from "react";
+import FormSkeleton from "@components/FormSkeleton";
 
 const EditPostContent = () => {
   const { data: session, status } = useSession();
@@ -63,7 +64,7 @@ const EditPostContent = () => {
     }
   };
 
-  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading") return <FormSkeleton />;
 
   return (
     <Form
@@ -78,7 +79,7 @@ const EditPostContent = () => {
 
 export default function EditPost() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<FormSkeleton />}>
       <EditPostContent />
     </Suspense>
   );

@@ -3,7 +3,7 @@ import Post from "@models/post";
 import Tag from "@models/tag";
 import { createNewTagIfNotExists } from "@utils/server-actions";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@app/api/auth/[...nextauth]/route";
+import { authOptions } from "@auth";
 
 import { DocumentPost, ViewPost } from "@data";
 

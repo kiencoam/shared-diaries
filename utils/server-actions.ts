@@ -4,7 +4,7 @@ import Tag from "@models/tag";
 import Post from "@models/post";
 import User from "@models/user";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@app/api/auth/[...nextauth]/route";
+import { authOptions } from "@auth";
 import { connectToDB } from "@utils/database";
 import { DocumentPost, ViewPost, ViewTag, ViewUser } from "@data";
 

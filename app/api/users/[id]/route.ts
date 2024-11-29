@@ -1,7 +1,7 @@
 import { connectToDB } from "@utils/database";
 import User from "@models/user";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@app/api/auth/[...nextauth]/route";
+import { authOptions } from "@auth";
 
 // GET /api/users/[id]
 export const GET = async (

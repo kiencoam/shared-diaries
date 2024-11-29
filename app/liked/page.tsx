@@ -4,7 +4,7 @@ import LikedFeed from "@components/LikedFeed";
 import { fetchTotalPagesLiked } from "@utils/server-actions";
 import { Suspense } from "react";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@app/api/auth/[...nextauth]/route";
+import { authOptions } from "@auth";
 import FeedSkeleton from "@components/FeedSkeleton";
 
 const MyLikedPage = async ({

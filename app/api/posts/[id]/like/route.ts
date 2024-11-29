@@ -1,7 +1,7 @@
 import { connectToDB } from "@utils/database";
 import Post from "@models/post";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@app/api/auth/[...nextauth]/route";
+import { authOptions } from "@auth";
 import { ObjectId } from "mongoose";
 
 interface RequestBody {

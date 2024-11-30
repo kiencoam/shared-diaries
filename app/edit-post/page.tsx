@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import Form from "@components/Form";
 
 import { CreatePost, DocumentPost } from "@data";
-import { MouseEventHandler, Suspense } from "react";
+import { Suspense } from "react";
 import FormSkeleton from "@components/FormSkeleton";
 
 const EditPostContent = () => {
@@ -45,9 +45,10 @@ const EditPostContent = () => {
     }
   }, [postId, status, session, router]);
 
-  const editPrompt: MouseEventHandler<HTMLButtonElement> = async (e) => {
+  const editPrompt = async (tagInput: string) => {
     setSubmitting(true);
 
+    if (tagInput) post.tags.push(tagInput);
     try {
       const reponse = await fetch(`api/posts/${postId}`, {
         method: "PATCH",

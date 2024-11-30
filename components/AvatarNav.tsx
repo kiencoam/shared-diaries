@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   signIn,
   signOut,
@@ -26,6 +26,23 @@ const AvatarNav = () => {
     image: "/assets/images/avatar-1.jpg",
   });
   const [toggleDropdown, setToggleDropdown] = useState<boolean>(false);
+  const desktopToggleRef = useRef<HTMLDivElement>(null);
+  const mobileToggleRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        desktopToggleRef.current &&
+        !desktopToggleRef.current.contains(event.target as Node) &&
+        mobileToggleRef.current &&
+        !mobileToggleRef.current.contains(event.target as Node)
+      ) {
+        setToggleDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -48,14 +65,14 @@ const AvatarNav = () => {
   return (
     <>
       {/* Desktop Navigation */}
-      <div className="hidden sm:flex">
+      <div className="hidden sm:flex relative">
         {session?.user ? (
           <div className="flex gap-3 md:gap-5">
             <Link href="/create-post" className="outline_btn">
               Tạo bài viết
             </Link>
 
-            <div className="relative">
+            <div ref={desktopToggleRef} className="flex">
               <Image
                 src={user.image}
                 width={37}
@@ -112,7 +129,13 @@ const AvatarNav = () => {
                   onClick={() => signIn(provider.id)}
                   className="black_btn"
                 >
-                  Đăng nhập
+                  <Image
+                    src="/assets/icons/google.svg"
+                    alt="Google icon"
+                    width={20}
+                    height={20}
+                  />
+                  <span className="ml-2">Đăng nhập với Google</span>
                 </button>
               ))}
           </>
@@ -122,7 +145,7 @@ const AvatarNav = () => {
       {/* Mobile Navigation */}
       <div className="sm:hidden flex relative">
         {session?.user ? (
-          <div className="flex">
+          <div ref={mobileToggleRef} className="flex">
             <Image
               src={user.image}
               width={37}
@@ -185,7 +208,13 @@ const AvatarNav = () => {
                   onClick={() => signIn(provider.id)}
                   className="black_btn"
                 >
-                  Đăng nhập
+                  <Image
+                    src="/assets/icons/google.svg"
+                    alt="Google icon"
+                    width={20}
+                    height={20}
+                  />
+                  <span className="ml-2">Đăng nhập với Google</span>
                 </button>
               ))}
           </>

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Sort = ({ sortby }: { sortby: string }) => {
   const pathname = usePathname();
@@ -15,7 +15,21 @@ const Sort = ({ sortby }: { sortby: string }) => {
     return `${pathname}?${params.toString()}`;
   };
 
+  const sortToggleRef = useRef<HTMLDivElement>(null);
   const [toggle, setToggle] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        sortToggleRef.current &&
+        !sortToggleRef.current.contains(event.target as Node)
+      ) {
+        setToggle(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const SortOptions = [
     { name: "Mới nhất", value: "newest" },
@@ -24,7 +38,7 @@ const Sort = ({ sortby }: { sortby: string }) => {
 
   return (
     <div className="mt-16 w-full flex-end ">
-      <div className="relative">
+      <div ref={sortToggleRef} className="relative">
         <button
           onClick={() => setToggle((prev) => !prev)}
           className="flex-center gap-1 p-2.5"

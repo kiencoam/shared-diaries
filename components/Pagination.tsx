@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
 
 const Pagination = ({ totalPages }: { totalPages: number }) => {
   const pathname = usePathname();
@@ -15,75 +14,58 @@ const Pagination = ({ totalPages }: { totalPages: number }) => {
     return `${pathname}?${params.toString()}`;
   };
 
-  const PageArray = useMemo(() => {
-    const pages = [];
-    for (let i = 1; i <= Math.min(totalPages, 4); i++) {
-      pages.push(i.toString());
-    }
-
-    if (totalPages > 4) {
-      pages.pop();
-      pages.push("...");
-      pages.push(totalPages.toString());
-    }
-
-    return pages;
-  }, [totalPages]);
-
   if (totalPages <= 1) return <div></div>;
 
   return (
-    <>
-      {/* Desktop Pagination */}
-      <div className="hidden sm:flex max-w-full my-16 h-12 rounded-md border-2 border-gray-200 bg-white font-satoshi text-sm shadow-lg font-medium focus:border-black focus:outline-none focus:ring-0">
+    <div className="my-16 flex-center gap-4">
+      {currentPage === 1 || (
         <button
-          disabled={currentPage === 1}
           onClick={() => replace(createPageURL(currentPage - 1))}
-          className="h-full w-28 border-r border-gray-200 rounded-l-md hover:bg-slate-50 hover:shadow-lg"
+          className="black_btn"
         >
-          Trang trước
-        </button>
-        {PageArray.map((page) => (
-          <button
-            key={page}
-            disabled={page === "..."}
-            onClick={() => replace(createPageURL(Number(page)))}
-            className={`h-full w-12 flex-center border-x border-gray-200 ${
-              page === currentPage.toString()
-                ? "bg-slate-100"
-                : "hover:bg-slate-50 hover:shadow-lg"
-            }`}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left"
           >
-            {page}
-          </button>
-        ))}
-        <button
-          disabled={currentPage === totalPages}
-          onClick={() => replace(createPageURL(currentPage + 1))}
-          className="h-full w-28 border-l border-gray-200 rounded-r-md hover:bg-slate-50 hover:shadow-lg"
-        >
-          Trang sau
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M15 6l-6 6l6 6" />
+          </svg>
+          <span className="ml-1">Trang trước</span>
         </button>
-      </div>
+      )}
 
-      {/* Mobile Pagination */}
-      <div className="sm:hidden flex max-w-full my-16 h-12 rounded-md border-2 border-gray-200 bg-white font-satoshi text-sm shadow-lg font-medium focus:border-black focus:outline-none focus:ring-0">
+      {currentPage === totalPages || (
         <button
-          disabled={currentPage === 1}
-          onClick={() => replace(createPageURL(currentPage - 1))}
-          className="h-full w-28 border-r border-gray-200 rounded-l-md hover:bg-slate-50 hover:shadow-lg"
-        >
-          Trang trước
-        </button>
-        <button
-          disabled={currentPage === totalPages}
           onClick={() => replace(createPageURL(currentPage + 1))}
-          className="h-full w-28 border-l border-gray-200 rounded-r-md hover:bg-slate-50 hover:shadow-lg"
+          className="outline_btn"
         >
-          Trang sau
+          <span className="mr-1">Trang sau</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-5 h-5"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M9 6l6 6l-6 6" />
+          </svg>
         </button>
-      </div>
-    </>
+      )}
+    </div>
   );
 };
 

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import Form from "@components/Form";
 
 import { CreatePost } from "@data";
-import { MouseEventHandler } from "react";
 import FormSkeleton from "@components/FormSkeleton";
 
 const CreateNewPost = () => {
@@ -26,9 +25,10 @@ const CreateNewPost = () => {
     }
   }, [status, session, router]);
 
-  const createPost: MouseEventHandler<HTMLButtonElement> = async (e) => {
+  const createPost = async (tagInput: string) => {
     setSubmitting(true);
 
+    if (tagInput) post.tags.push(tagInput);
     try {
       await fetch("api/posts/new", {
         method: "POST",
